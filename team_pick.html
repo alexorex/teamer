@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>teamer</title>
+    <style type="text/css">
+        body {
+            background-color:rosybrown;
+            font-size: 36px;
+            /* transform: scale(5); */
+        }
+        .teams{
+            display: inline-flex;
+            flex-direction: column;
+        }
+        .gen_but{
+            max-width: min-content;
+            align-self: center
+        }
+        .team-boxes-div{
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .team-box{
+            border-width: 1.5px;
+            border-style: solid;
+            border-radius: 5px;
+            padding: 5px;
+            margin: 5px;
+        }
+    </style>
+
+    <script type="text/javascript">
+        function pick_r(i){
+            return Math.floor(Math.random() * i)
+        }
+
+        function split_set_evenly(s, count){
+            let sets = [];
+            ss_len = Math.ceil(s.length/count);
+            for(let i = 0; i < count; i++){
+                let t = s.slice(ss_len*i, ss_len*(i+1));
+                sets.push(t);
+            }
+            return sets;
+        }
+
+
+        function shuffled(l){
+            ll = Array.from(l);
+            lr = []
+            ss = ll.length;
+            while(ss){
+                n = pick_r(ss);
+                lr.push(ll.splice(n,1)[0]);
+                // console.log(ll);
+                ss = ll.length;
+            }
+            return lr;
+        }
+
+
+        function shuffled_list(len, start=0){
+            l = [];
+            for(let i = start; i < len+start; i++){
+                l.push(i);
+            }
+
+            return shuffled(l);
+        }
+
+        // console.log(shuffled_list(21));
+    </script>
+    <script type="text/javascript">
+        window.onload = function(){
+            player_count = document.getElementsByClassName("player_count")[0];
+            team_count = document.getElementsByClassName("team_count")[0];
+            generate_but = document.getElementsByClassName('gen_but')[0];
+            // generate_but.addEventListener("click", generate_teams);
+            generate_but.addEventListener("click", make_team_divs);
+            res_disp = document.getElementsByClassName("res_disp")[0];
+        };
+    </script>
+    <script type="text/javascript">
+        function generate_teams(){
+            let pl_count = +player_count.value;
+            let t_count = Number(team_count.value);
+            let quotient = Math.floor(pl_count/t_count),
+                remainder = pl_count%t_count;
+            bulk = shuffled_list(t_count*quotient, 1);
+            teams = split_set_evenly(bulk, t_count);
+            if(!remainder){
+                return teams;
+            }
+            teams_remainder = split_set_evenly(shuffled_list(t_count, quotient*t_count+1), t_count);
+            for(let i = 0; i < t_count; i++){
+                teams[i].push(teams_remainder[i][0]);
+            }
+            // res_disp.innerText = String(teams);
+            // console.log(teams);
+            return teams;
+        }
+
+        function make_team_divs(){
+            teams = generate_teams();
+            document.getElementsByClassName("team-boxes-div")[0].innerHTML = "";
+            for(let i = 0; i < teams.length; i++){
+                let div = document.createElement("div");
+                div.setAttribute("class", "team-box tb"+(i+1));
+                div.innerText = teams[i];
+                document.getElementsByClassName("team-boxes-div")[0].appendChild(div);
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="teams">
+        <div>
+            <input type="number" step="1" pattern="\d+" min="1" value="2" class="player_count">
+            <input type="number" step="1" pattern="\d+" min="1" value="2" class="team_count">
+            <button class="gen_but">generate</button>
+        </div>
+        <div class="team-boxes-div">
+            <!-- <div class="team-box tb1">div_1</div>
+            <div class="team-box tb2">div_2</div>
+            <div class="team-box tb3">div_3</div> -->
+        </div>
+        <!-- <p class="res_disp"></p> -->
+    </div>
+</body>
+</html>
